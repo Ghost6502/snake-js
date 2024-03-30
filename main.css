@@ -45,9 +45,20 @@ body {
     position: relative;
 }
 
+#game h4 {
+    margin: 0;
+    position: absolute;
+    top: -20px;
+    right: 0;
+}
+
 #game div {
     width: 20px;
     height: 20px;
     background-color: #5BFF62;
     position: absolute;
+}
+
+div#apple {
+    background-color: #F6522E;
 }

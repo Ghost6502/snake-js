@@ -32,7 +32,7 @@ function headMove(head, direction) {
 }
 
 function move(game, head, direction) {
-    for (let i = game.childElementCount - 1; i > 0; i--) {
+    for (let i = game.childElementCount - 1; i > 2; i--) {
         setTop(game.children[i], game.children[i-1])
         setLeft(game.children[i], game.children[i-1])
     }
@@ -50,10 +50,19 @@ function checkBorders(game, card, head, direction) {
     return 0
 }
 
+function checkApple(left, top, apple, score) {
+    if (apple.style.left == left && apple.style.top == top) {
+        apple.style.left = `${randomInteger(1, 39) * 20}px`
+        apple.style.top = `${randomInteger(1, 29) * 20}px`
+        score.innerHTML = Number(score.innerHTML) + 1
+    }
+}
+
 let card = document.getElementById('card')
 let text = document.getElementById('text')
 let button = document.getElementById('button')
 let game = document.getElementById('game')
+let score = document.getElementById('score')
 let apple = document.getElementById('apple')
 let snakeHead = document.getElementById('snake-head')
 let direction = 1 // 0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
@@ -64,9 +73,11 @@ button.addEventListener('click', function() {
     card.classList.add('hide')
     game.classList.remove('hide')
     gameStatus = 1
-    for (let i = 0; i < game.childElementCount; i++){
+    apple.style.top = '280px'
+    apple.style.left = '420px'
+    for (let i = 2; i < game.childElementCount; i++){
         game.children[i].style.top = '280px'
-        game.children[i].style.left = `${240-20*i}px`
+        game.children[i].style.left = `${240-20*(i-1)}px`
     }
 })
 
@@ -98,5 +109,6 @@ setInterval(function() {
         text.innerHTML = 'Ты проиграл! Как будешь готов попробовать ещё раз, нажми на кнопку!'
     }
     move(game, snakeHead, direction)
+    checkApple(snakeHead.style.left, snakeHead.style.top, apple, score)
     rotatePermission = true
 }, 200)
