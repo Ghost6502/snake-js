@@ -1,8 +1,18 @@
+function stopGame(game, card) {
+    game.classList.add('hide')
+    card.classList.remove('hide')
+}
+
 function pxRemove(string) { return Number(string.slice(0, -2))}
 
 function setTop(block, block2, x = 0) { block.style.top = `${pxRemove(block2.style.top) + x}px` }
 
 function setLeft(block, block2, x = 0) { block.style.left = `${pxRemove(block2.style.left) + x}px` }
+
+function randomInteger(min, max) {
+    let rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
+}
 
 function headMove(head, direction) {
     switch (direction){
@@ -22,50 +32,71 @@ function headMove(head, direction) {
 }
 
 function move(game, head, direction) {
-    for (let i = 1; i < game.childElementCount; i++) {
+    for (let i = game.childElementCount - 1; i > 0; i--) {
         setTop(game.children[i], game.children[i-1])
         setLeft(game.children[i], game.children[i-1])
     }
     headMove(head, direction)
 }
 
+function checkBorders(game, card, head, direction) {
+    if (head.style.top == '0px' && direction == 0 ||
+        head.style.top == '580px' && direction == 2 ||
+        head.style.left == '780px' && direction == 1 ||
+        head.style.left == '0px' && direction == 3) {
+            stopGame(game, card)
+            return 1
+        }
+    return 0
+}
+
 let card = document.getElementById('card')
 let text = document.getElementById('text')
 let button = document.getElementById('button')
 let game = document.getElementById('game')
+let apple = document.getElementById('apple')
 let snakeHead = document.getElementById('snake-head')
 let direction = 1 // 0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
 let gameStatus = 0 // 1 - игра началась
-
-for (let i = 0; i < game.childElementCount; i++){
-    game.children[i].style.top = '280px'
-    game.children[i].style.left = `${240-20*i}px`
-}
+let rotatePermission = true
 
 button.addEventListener('click', function() {
     card.classList.add('hide')
     game.classList.remove('hide')
     gameStatus = 1
+    for (let i = 0; i < game.childElementCount; i++){
+        game.children[i].style.top = '280px'
+        game.children[i].style.left = `${240-20*i}px`
+    }
 })
 
 document.addEventListener('keydown', (event) => {
     const key = event.key;
-    switch (key) {
-        case 'ArrowUp': 
-            direction = 0
-            break
-        case 'ArrowRight':
-            direction = 1
-            break
-        case 'ArrowDown':
-            direction = 2
-            break
-        case 'ArrowLeft':
-            direction = 3
-            break
+    if (rotatePermission) {
+        switch (key) {
+            case 'ArrowUp': 
+                direction = (direction != 2 ? 0 : 2)
+                break
+            case 'ArrowRight':
+                direction = (direction != 3 ? 1 : 3)
+                break
+            case 'ArrowDown':
+                direction = (direction != 0 ? 2 : 0)
+                break
+            case 'ArrowLeft':
+                direction = (direction != 1 ? 3 : 1)
+                break
+        }
+        rotatePermission = false
     }
 })
 
 setInterval(function() {
+    if (checkBorders(game, card, snakeHead, direction)) {
+        gameStatus = 0
+        direction = 1
+        text.innerHTML = 'Ты проиграл! Как будешь готов попробовать ещё раз, нажми на кнопку!'
+    }
     move(game, snakeHead, direction)
-}, 1000)
+    rotatePermission = true
+}, 200)
