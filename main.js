@@ -70,8 +70,17 @@ function checkApple(left, top, game, apple) {
     }
 }
 
+function checkSnake(left, top, game, card) {
+    for (let i = 3; i < game.childElementCount; i++)
+        if (left == game.children[i].style.left &&
+            top == game.children[i].style.top) {
+            stopGame(game, card)
+            return 1
+        }
+    return 0
+}
+
 let card = document.getElementById('card')
-let text = document.getElementById('text')
 let button = document.getElementById('button')
 let game = document.getElementById('game')
 let apple = document.getElementById('apple')
@@ -118,10 +127,10 @@ setInterval(function() {
     apple = document.getElementById('apple')
     snakeHead = document.getElementById('snake-head')
     if (gameStatus) {
-        if (checkBorders(game, card, snakeHead, direction)) {
+        if (checkBorders(game, card, snakeHead, direction) || checkSnake(snakeHead.style.left, snakeHead.style.top, game, card)) {
             gameStatus = 0
             direction = 1
-            text.innerHTML = 'Ты проиграл! Как будешь готов попробовать ещё раз, нажми на кнопку!'
+            document.getElementById('text').innerHTML = 'Ты проиграл! Как будешь готов попробовать ещё раз, нажми на кнопку!'
         }
         move(game)
         headMove(snakeHead, direction)
