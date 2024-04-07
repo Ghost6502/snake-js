@@ -31,12 +31,11 @@ function headMove(head, direction) {
     }
 }
 
-function move(game, head, direction) {
+function move(game) {
     for (let i = game.childElementCount - 1; i > 2; i--) {
         setTop(game.children[i], game.children[i-1])
         setLeft(game.children[i], game.children[i-1])
     }
-    headMove(head, direction)
 }
 
 function checkBorders(game, card, head, direction) {
@@ -50,11 +49,21 @@ function checkBorders(game, card, head, direction) {
     return 0
 }
 
-function checkApple(left, top, apple, score) {
+function checkApple(left, top, game, apple, score) {
     if (apple.style.left == left && apple.style.top == top) {
-        apple.style.left = `${randomInteger(1, 39) * 20}px`
-        apple.style.top = `${randomInteger(1, 29) * 20}px`
+        let successfulGeneration
+        do{
+            successfulGeneration = true
+            apple.style.left = `${randomInteger(1, 39) * 20}px`
+            apple.style.top = `${randomInteger(1, 29) * 20}px`
+            for (let i = game.childElementCount - 1; i > 1; i--) 
+                if (apple.style.left == game.children[i].style.left && apple.style.top == game.children[i].style.top)
+                    successfulGeneration = false
+        } while (!successfulGeneration);
         score.innerHTML = Number(score.innerHTML) + 1
+        game.innerHTML += '<div></div>'
+        setTop(game.children[game.childElementCount-1], game.children[game.childElementCount-2])
+        setLeft(game.children[game.childElementCount-1], game.children[game.childElementCount-2])
     }
 }
 
@@ -74,7 +83,7 @@ button.addEventListener('click', function() {
     game.classList.remove('hide')
     gameStatus = 1
     apple.style.top = '280px'
-    apple.style.left = '420px'
+    apple.style.left = '320px'
     for (let i = 2; i < game.childElementCount; i++){
         game.children[i].style.top = '280px'
         game.children[i].style.left = `${240-20*(i-1)}px`
@@ -103,12 +112,22 @@ document.addEventListener('keydown', (event) => {
 })
 
 setInterval(function() {
-    if (checkBorders(game, card, snakeHead, direction)) {
-        gameStatus = 0
-        direction = 1
-        text.innerHTML = 'Ты проиграл! Как будешь готов попробовать ещё раз, нажми на кнопку!'
+    card = document.getElementById('card')
+    text = document.getElementById('text')
+    button = document.getElementById('button')
+    game = document.getElementById('game')
+    score = document.getElementById('score')
+    apple = document.getElementById('apple')
+    snakeHead = document.getElementById('snake-head')
+    if (gameStatus) {
+        if (checkBorders(game, card, snakeHead, direction)) {
+            gameStatus = 0
+            direction = 1
+            text.innerHTML = 'Ты проиграл! Как будешь готов попробовать ещё раз, нажми на кнопку!'
+        }
+        move(game)
+        headMove(snakeHead, direction)
+        checkApple(snakeHead.style.left, snakeHead.style.top, game, apple, score)
+        rotatePermission = true
     }
-    move(game, snakeHead, direction)
-    checkApple(snakeHead.style.left, snakeHead.style.top, apple, score)
-    rotatePermission = true
-}, 200)
+}, 100)
