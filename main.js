@@ -1,6 +1,9 @@
 function stopGame(game, card) {
     game.classList.add('hide')
     card.classList.remove('hide')
+    document.getElementById('score').innerHTML = 0
+    for (let i = game.childElementCount - 1; i > 4; i--)
+        game.children[i].remove()
 }
 
 function pxRemove(string) { return Number(string.slice(0, -2))}
@@ -49,7 +52,7 @@ function checkBorders(game, card, head, direction) {
     return 0
 }
 
-function checkApple(left, top, game, apple, score) {
+function checkApple(left, top, game, apple) {
     if (apple.style.left == left && apple.style.top == top) {
         let successfulGeneration
         do{
@@ -60,7 +63,7 @@ function checkApple(left, top, game, apple, score) {
                 if (apple.style.left == game.children[i].style.left && apple.style.top == game.children[i].style.top)
                     successfulGeneration = false
         } while (!successfulGeneration);
-        score.innerHTML = Number(score.innerHTML) + 1
+        document.getElementById('score').innerHTML = Number(document.getElementById('score').innerHTML) + 1
         game.innerHTML += '<div></div>'
         setTop(game.children[game.childElementCount-1], game.children[game.childElementCount-2])
         setLeft(game.children[game.childElementCount-1], game.children[game.childElementCount-2])
@@ -71,7 +74,6 @@ let card = document.getElementById('card')
 let text = document.getElementById('text')
 let button = document.getElementById('button')
 let game = document.getElementById('game')
-let score = document.getElementById('score')
 let apple = document.getElementById('apple')
 let snakeHead = document.getElementById('snake-head')
 let direction = 1 // 0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
@@ -112,11 +114,7 @@ document.addEventListener('keydown', (event) => {
 })
 
 setInterval(function() {
-    card = document.getElementById('card')
-    text = document.getElementById('text')
-    button = document.getElementById('button')
     game = document.getElementById('game')
-    score = document.getElementById('score')
     apple = document.getElementById('apple')
     snakeHead = document.getElementById('snake-head')
     if (gameStatus) {
@@ -127,7 +125,7 @@ setInterval(function() {
         }
         move(game)
         headMove(snakeHead, direction)
-        checkApple(snakeHead.style.left, snakeHead.style.top, game, apple, score)
+        checkApple(snakeHead.style.left, snakeHead.style.top, game, apple)
         rotatePermission = true
     }
 }, 100)
